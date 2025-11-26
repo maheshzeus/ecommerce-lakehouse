@@ -1,0 +1,63 @@
+
+config.sources.yaml
+
+# =====================================================================
+# SOURCE CONFIGURATION FOR E-COMMERCE LAKEHOUSE
+# =====================================================================
+
+environment: "dev"
+
+paths:
+  landing_base: "/mnt/ecomdev/landing"
+  bronze_base: "/mnt/ecomdev/bronze"
+
+sources:
+
+  customers:
+    file_pattern: "customers/*.csv"
+    format: "csv"
+    delimiter: ","
+    header: true
+    schema: "customers_schema"
+    incremental_key: "updated_at"
+    target_table: "bronze_customers_raw"
+
+  orders:
+    file_pattern: "orders/*.json"
+    format: "json"
+    multiline: false
+    schema: "orders_schema"
+    incremental_key: "order_timestamp"
+    target_table: "bronze_orders_raw"
+
+  order_items:
+    file_pattern: "order_items/*.parquet"
+    format: "parquet"
+    schema: "order_items_schema"
+    incremental_key: "order_item_id"
+    target_table: "bronze_order_items_raw"
+
+  products:
+    file_pattern: "products/*.csv"
+    format: "csv"
+    delimiter: ","
+    header: true
+    schema: "products_schema"
+    incremental_key: "updated_at"
+    target_table: "bronze_products_raw"
+
+  payments:
+    file_pattern: "payments/*.json"
+    format: "json"
+    schema: "payments_schema"
+    incremental_key: "payment_timestamp"
+    target_table: "bronze_payments_raw"
+
+# STREAMING SOURCE
+  clickstream:
+    source_type: "eventhub"
+    eventhub_name: "eh-clickstream"
+    consumer_group: "$Default"
+    schema: "clickstream_schema"
+    checkpoint_location: "/mnt/ecomdev/checkpoints/clickstream"
+    target_table: "bronze_clickstream_raw"
